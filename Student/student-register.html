@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      overflow: hidden;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .wizard-container {
+      position: relative;
+      width: 90%;
+      max-width: 900px;
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      background: rgba(30, 30, 46, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      display: flex;
+      z-index: 10;
+    }
+
+    .sidebar {
+      width: 20%;
+      background: rgba(30, 30, 46, 0.8);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      color: #d3d3d3;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 10px;
+    }
+
+    .step-item.active {
+      color: #00e6c0;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .step-item.disabled {
+      color: #6b7280;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .step-item span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .main-content {
+      width: 80%;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .step-content {
+      display: none;
+      color: #e1e3e7;
+    }
+
+    .step-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .progress {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #00e6c0;
+      transition: width 0.3s ease;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #e5e7eb;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .input-field:focus {
+      border-color: #00e6c0;
+      outline: none;
+    }
+
+    .btn-next, .btn-back {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .btn-next {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-next:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.2);
+      margin-right: 1rem;
+    }
+
+    .btn-back:hover {
+      transform: scale(1.05);
+    }
+
+    .verify-info-box {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #00e6c0;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .verify-info-box p {
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      color: #00e6c0;
+    }
+
+    .verify-info-box strong {
+      font-weight: 500;
+    }
+
+    .student-info p {
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      color: #d3d3d3;
+    }
+
+    .student-info strong {
+      color: #00e6c0;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.05);
+      animation: float 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-1000px) rotate(720deg); }
+    }
+
+    @media (max-width: 420px) {
+      .wizard-container {
+        width: 90%;
+        padding: 30px 20px;
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .main-content {
+        width: 100%;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bubble" style="width: 100px; height: 100px; left: 10%; top: 90%;"></div>
+  <div class="bubble" style="width: 150px; height: 150px; left: 70%; top: 95%;"></div>
+  <div class="bubble" style="width: 80px; height: 80px; left: 30%; top: 85%;"></div>
+  <div class="bubble" style="width: 120px; height: 120px; left: 80%; top: 100%;"></div>
+
+  <div class="wizard-container">
+    <div class="sidebar">
+      <div class="step-item active" data-step="1"><span>1. Enter USN</span></div>
+      <div class="step-item disabled" data-step="2"><span>2. Verify Info</span></div>
+      <div class="step-item disabled" data-step="3"><span>3. Contact Details</span></div>
+      <div class="step-item disabled" data-step="4"><span>4. Set Password</span></div>
+    </div>
+    <div class="main-content">
+      <div class="progress">
+        <div id="progressBar" class="progress-bar" style="width: 25%;"></div>
+      </div>
+      <h2 class="text-xl font-semibold text-[#00e6c0] mb-4">Student Registration</h2>
+
+      <!-- Step 1: USN -->
+      <div id="step1Content" class="step-content active">
+        <label for="usn" class="block text-sm font-medium mb-2">University Serial Number</label>
+        <input type="text" id="usn" placeholder="e.g., 1AT23IS001" class="input-field">
+        <div class="flex mt-4">
+          <button onclick="prevStep()" class="btn-back hidden">Back</button>
+          <button onclick="validateUSN()" class="btn-next ml-auto">Next</button>
+          <button onclick="proceedManually()" class="btn-next ml-4">Proceed Manually</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Display Info -->
+      <div id="step2Content" class="step-content">
+        <div id="studentInfo" class="verify-info-box"></div>
+        <div class="flex mt-4">
+          <button onclick="prevStep()" class="btn-back">Back</button>
+          <button onclick="nextStep(2)" class="btn-next ml-auto">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Email and Mobile -->
+      <div id="step3Content" class="step-content">
+        <label for="email" class="block text-sm font-medium mb-2">Email Address</label>
+        <input type="email" id="email" placeholder="e.g., student@university.edu" class="input-field">
+        <label for="mobile" class="block text-sm font-medium mb-2">Mobile Number</label>
+        <input type="text" id="mobile" placeholder="e.g., 9876543210" class="input-field">
+        <div class="flex mt-4">
+          <button onclick="prevStep()" class="btn-back">Back</button>
+          <button onclick="nextStep(3)" class="btn-next ml-auto">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Password -->
+      <div id="step4Content" class="step-content">
+        <label for="password" class="block text-sm font-medium mb-2">Create Password</label>
+        <input type="password" id="password" placeholder="Enter your password" class="input-field">
+        <div class="flex mt-4">
+          <button onclick="prevStep()" class="btn-back">Back</button>
+          <button onclick="submitRegistration()" class="btn-next ml-auto">Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let studentData = {};
+
+    function goToStep(step) {
+      if (step >= 1 && step <= 4 && step <= currentStep) {
+        currentStep = step;
+        updateStepDisplay();
+      }
+    }
+
+    function updateStepDisplay() {
+      const progressBar = document.getElementById('progressBar');
+      const steps = document.getElementsByClassName('step-content');
+      const stepItems = document.getElementsByClassName('step-item');
+      for (let i = 0; i < steps.length; i++) {
+        steps[i].classList.remove('active');
+        stepItems[i].classList.remove('active');
+        stepItems[i].classList.toggle('disabled', i >= currentStep);
+      }
+      document.getElementById(`step${currentStep}Content`).classList.add('active');
+      for (let i = 0; i < currentStep; i++) {
+        stepItems[i].classList.add('active');
+      }
+      progressBar.style.width = `${(currentStep / 4) * 100}%`;
+      document.querySelectorAll('.btn-back').forEach(btn => {
+        btn.classList.toggle('hidden', currentStep === 1);
+      });
+    }
+    function proceedManually() {
+  studentData = {}; // Empty object for manual entry
+  currentStep = 2;
+  updateStepDisplay();
+  // Show input fields for manual entry
+  const infoBox = document.getElementById('studentInfo');
+  infoBox.innerHTML = `
+    <label class="block text-sm font-medium mb-2">Name</label>
+    <input type="text" id="manualName" placeholder="Enter your name" class="input-field">
+    <label class="block text-sm font-medium mb-2">Branch</label>
+    <input type="text" id="manualBranch" placeholder="e.g., ISE, CSE" class="input-field">
+    <label class="block text-sm font-medium mb-2">Semester</label>
+    <input type="number" id="manualSem" placeholder="e.g., 3" class="input-field">
+  `;
+}
+
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    }
+
+    function validateUSN() {
+      const usn = document.getElementById('usn').value.trim().toUpperCase();
+      if (!usn) {
+        alert('Please enter your USN.');
+        return;
+      }
+
+      console.log('Sending USN:', usn);
+
+      fetch('fetch_student_info.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `usn=${encodeURIComponent(usn)}`
+      })
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Fetch response:', data);
+        if (data.success) {
+          studentData = { usn, ...data.student };
+          displayStudentInfo();
+          currentStep = 2;
+          updateStepDisplay();
+        } else {
+          alert(data.error || 'Student not found.');
+        }
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Failed to fetch student details: ' + error.message);
+      });
+    }
+
+    function displayStudentInfo() {
+      const infoDiv = document.getElementById('studentInfo');
+      infoDiv.innerHTML = `
+        <p><strong>Name:</strong> ${studentData.name}</p>
+        <p><strong>Semester:</strong> ${studentData.semester}</p>
+        <p><strong>Branch:</strong> ${studentData.branch}</p>
+        <p><strong>College:</strong> ${studentData.college}</p>
+      `;
+    }
+
+    function nextStep(step) {
+      if (step === 2) {
+        currentStep = 3;
+      } else if (step === 3) {
+        const email = document.getElementById('email').value.trim();
+        const mobile = document.getElementById('mobile').value.trim();
+        if (!email || !mobile) {
+          alert('Please enter both email and mobile number.');
+          return;
+        }
+        studentData.email = email;
+        studentData.mobile = mobile;
+        currentStep = 4;
+      }
+      updateStepDisplay();
+    }
+
+    function submitRegistration() {
+      const password = document.getElementById('password').value.trim();
+      if (!password) {
+        alert('Please set a password.');
+        return;
+      }
+      studentData.password = password;
+
+      fetch('register_student.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `usn=${encodeURIComponent(studentData.usn)}&email=${encodeURIComponent(studentData.email)}&mobile=${encodeURIComponent(studentData.mobile)}&password=${encodeURIComponent(studentData.password)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Registration response:', data);
+        if (data.success) {
+          alert('Registration successful! You can now log in.');
+          currentStep = 1;
+          updateStepDisplay();
+        } else {
+          alert(data.error || 'Registration failed.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to register student.');
+      });
+    }
+
+    document.querySelectorAll('.step-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const step = parseInt(item.getAttribute('data-step'));
+        goToStep(step);
+      });
+    });
+
+    updateStepDisplay();
+  </script>
+</body>
+</html>
