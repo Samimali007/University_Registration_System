@@ -87,19 +87,25 @@ try {
         'success' => true,
         'message' => 'File uploaded successfully!',
     ];
-} else {
+} catch (Exception $e) {
     $response = [
         'success' => false,
-        'message' => 'No file uploaded or upload error.',
+        'message' => $e->getMessage(),
     ];
 }
 } else {
 $response = [
     'success' => false,
-    'message' => 'Invalid request method.',
+    'message' => 'No file uploaded or upload error.',
 ];
 }
 
+} else {
+    $response = [
+        'success' => false,
+        'message' => 'Invalid request method.',
+    ];
+}
+
 echo json_encode($response);
-exit;
 ?>
